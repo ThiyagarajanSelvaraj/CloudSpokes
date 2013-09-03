@@ -1,0 +1,238 @@
+<apex:page standardController="Template__c" extensions="TemplateController" >
+	<apex:sectionHeader title="Home" subtitle="{!IF(ISNULL(Template__c.Id),'New',Template__c.Name)}" />
+	<apex:includeScript value="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" />
+	<apex:pageMessages />
+	<apex:form >
+		<input type="hidden" id="selQuoteInfoFields" name="selQuoteInfoFields" value="" />
+		<input type="hidden" id="selQuoteLineItemFields" name="selQuoteLineItemFields" value="" />
+		<input type="hidden" id="selQuoteTotalFields" name="selQuoteTotalFields" value="" />
+		<input type="hidden" id="sectionOrderList" name="sectionOrderList" value="" />
+		
+		<apex:pageBlock title="{!IF(ISNULL(Template__c.Id),'Create','Edit')} Template" id="pbBlock" >
+			
+			<script type="text/javascript" >
+				var $j = jQuery.noConflict();
+				
+				// Move option from available select list to selected select List
+	            function AddOption(firstListId, secondListId) {
+	                if ($j("." + firstListId + " option:selected").length != 0) {
+	                    $j("." + firstListId + " option:selected").each(function () {
+	                        var option = $j('<option></option>').val($j(this).val()).text($j(this).text());
+	                        $j("." + firstListId + " option:selected").remove();
+	                        $j("." + secondListId + "").append(option);
+	                    });
+	                }
+	            }
+	            
+	            // Move option from selected select list to available select List
+	            function RemoveOption(firstListId, secondListId) {
+	                if ($j("." + firstListId + " option:selected").length != 0) {
+	                    $j("." + firstListId + " option:selected").each(function () {
+	                        var option = $j('<option></option>').val($j(this).val()).text($j(this).text());
+	                        $j("." + firstListId + " option:selected").remove();
+	                        $j("." + secondListId + "").append(option);
+	                    });
+	                }
+	            }
+	           
+	            //Move the option upwards in the selectList 
+	            function MoveUp(selectList){
+	            	if ($j("." + selectList + " option:selected").length != 0) {
+	            		$j("." + selectList + " option:selected").first().prev().before($j("." + selectList + " option:selected"));
+	            	}
+	            }
+	            
+	            //Move the option upwards in the selectList 
+	            function MoveDown(selectList){
+	            	if ($j("." + selectList + " option:selected").length != 0) {
+	            		$j("." + selectList + " option:selected").last().next().after($j("." + selectList + " option:selected"));
+	            	}
+	            }
+	            
+	            // Pass the select fields into the controller
+	            function selectedFieldsList(){
+	            	 $j('#selQuoteInfoFields').val(createString('SelectedQuoteInfoFields'));
+	            	 $j('#selQuoteLineItemFields').val(createString('SelectedQuoteItemFields'));
+	            	 $j('#selQuoteTotalFields').val(createString('SelectedQuoteTotalFields'));
+	            	 $j('#sectionOrderList').val(createString('sectionOrder'));
+	            }
+	            
+	             // Get the selected field and make it as a string
+	            function createString(className){
+	            	var fieldsList = '';
+	            	if ($j("."+className +" option").length > 0){
+	            		 $j("."+className +" option").each(function () {
+                               fieldsList += (fieldsList == '') ? $j(this).val() : ',' + $j(this).val();
+                         });
+	            	}
+	            	return fieldsList;
+	            }
+			</script>
+			
+			<apex:pageBlockButtons >
+				<apex:commandButton value="Save" onclick="selectedFieldsList();" action="{!saveTemplate}" />
+				<apex:commandButton value="Cancel" action="{!cancel}" />
+			</apex:pageBlockButtons>
+			<apex:pageBlockSection columns="1" >
+				<apex:inputField required="true" value="{!Template__c.Name}" />
+				<!-- Section Order -->
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Section Order" />
+					<apex:outputPanel layout="none">
+						<table>
+							<tr>
+								<td>
+									<apex:selectList styleClass="sectionOrder"  value="{!sectionOrder}" multiselect="false" size="7">
+										<apex:selectOptions value="{!sectionOrderList}" />
+									</apex:selectList>
+								</td>
+								<td>
+									<table>
+                                        <tr><td><img src="/s.gif" alt="Up" class="upArrowIcon" onclick="MoveUp('sectionOrder');" style="cursor:pointer; margin-top:1.8em;" title="Up" /></td></tr>
+                                        <tr><td><img src="/s.gif" alt="Down" class="downArrowIcon" onclick="MoveDown('sectionOrder');" style="cursor:pointer; margin-top:2.2em;" title="Down" /></td></tr>
+                                    </table>
+								</td>
+							</tr>
+						</table>
+					</apex:outputPanel>
+ 				</apex:pageBlockSectionItem>
+				<!-- Header Type -->
+				<apex:inputField value="{!Template__c.Header_Type__c}" />
+				<!-- Header -->
+				<apex:inputField style="width:100px; height:200px;" value="{!Template__c.Header__c}" />
+				<!-- Welcome Message -->
+				<apex:inputField style="width:100px; height:200px;" value="{!Template__c.Welcome_Message__c}" />
+				
+				<!-- Quote Info -->
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Quote Info" /> 
+					<apex:outputPanel layout="none" >
+						<table>
+                            <tr>
+                                <td style="text-align:center;"><b>Available</b></td>
+                                <td></td>
+                                <td style="text-align:center;"><b>Selected</b></td>
+                            </tr>
+                            <tr>  
+                                <td>
+                                    <!-- Available -->
+                                    <apex:selectList styleClass="AvailableQuoteInfoFields" size="6" multiselect="true" style="width:12em;">
+                                        <apex:selectOptions value="{!availableQuoteInfoFields}" />
+                                    </apex:selectList>
+                                </td>
+                                <td>
+                                    <table>
+                                        <tr><td><img src="/s.gif" alt="Add" class="picklistArrowRight" onclick="AddOption('AvailableQuoteInfoFields','SelectedQuoteInfoFields');" style="cursor:pointer; margin-top:1.8em;" title="Add" /></td></tr>
+                                        <tr><td><img src="/s.gif" alt="Remove" class="picklistArrowLeft" onclick="RemoveOption('SelectedQuoteInfoFields','AvailableQuoteInfoFields');" style="cursor:pointer; margin-top:2.2em;" title="Remove" /></td></tr>
+                                    </table>
+                                </td>
+                                <td>
+                                    <!-- Selected -->
+                                    <apex:selectList styleClass="SelectedQuoteInfoFields" size="6" multiselect="true" style="width:12em;" >
+                                        <apex:selectOptions value="{!selectedQuoteInfoFields}" />
+                                    </apex:selectList>
+                                </td>
+                                <td>
+                                    <table>
+                                        <tr><td><img src="/s.gif" alt="Up" class="upArrowIcon" onclick="MoveUp('SelectedQuoteInfoFields');" style="cursor:pointer; margin-top:1.8em;" title="Up" /></td></tr>
+                                        <tr><td><img src="/s.gif" alt="Down" class="downArrowIcon" onclick="MoveDown('SelectedQuoteInfoFields');" style="cursor:pointer; margin-top:2.2em;" title="Down" /></td></tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				
+				<!-- Quote Line Item -->
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Quote Line Item" /> 
+					<apex:outputPanel layout="none" >
+						<table>
+                            <tr>
+                                <td style="text-align:center;"><b>Available</b></td>
+                                <td></td>
+                                <td style="text-align:center;"><b>Selected</b></td>
+                            </tr>
+                            <tr>  
+                                <td>
+                                    <!-- Available -->
+                                    <apex:selectList styleClass="AvailableQuoteItemFields" size="6" multiselect="true" style="width:12em;">
+                                        <apex:selectOptions value="{!availableQuoteLineItemFields}" />
+                                    </apex:selectList>
+                                </td>
+                                <td>
+                                    <table>
+                                        <tr><td><img src="/s.gif" alt="Add" class="picklistArrowRight" onclick="AddOption('AvailableQuoteItemFields','SelectedQuoteItemFields');" style="cursor:pointer; margin-top:1.8em;" title="Add" /></td></tr>
+                                        <tr><td><img src="/s.gif" alt="Remove" class="picklistArrowLeft" onclick="RemoveOption('SelectedQuoteItemFields','AvailableQuoteItemFields');" style="cursor:pointer; margin-top:2.2em;" title="Remove" /></td></tr>
+                                    </table>
+                                </td>
+                                <td>
+                                    <!-- Selected -->
+                                    <apex:selectList id="QuoteLineItem" styleClass="SelectedQuoteItemFields" size="6" multiselect="true" style="width:12em;" >
+                                        <apex:selectOptions value="{!selectedQuoteLineItemFields}" />
+                                    </apex:selectList>
+                                </td>
+                                <td>
+                                    <table>
+                                        <tr><td><img src="/s.gif" alt="Up" class="upArrowIcon" onclick="MoveUp('SelectedQuoteItemFields');" style="cursor:pointer; margin-top:1.8em;" title="Up" /></td></tr>
+                                        <tr><td><img src="/s.gif" alt="Down" class="downArrowIcon" onclick="MoveDown('SelectedQuoteItemFields');" style="cursor:pointer; margin-top:2.2em;" title="Down" /></td></tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				
+				<apex:inputField value="{!Template__c.Show_Quote_Total__c}" />
+				<apex:inputField value="{!Template__c.Show_Address__c}" />
+				
+				<!-- Quote Info -->
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Quote Total" /> 
+					<apex:outputPanel layout="none" >
+						<table>
+                            <tr>
+                                <td style="text-align:center;"><b>Available</b></td>
+                                <td></td>
+                                <td style="text-align:center;"><b>Selected</b></td>  
+                            </tr>
+                            <tr>  
+                                <td>
+                                    <!-- Available -->
+                                    <apex:selectList styleClass="AvailableQuoteTotalFields" size="6" multiselect="true" style="width:12em;">
+                                        <apex:selectOptions value="{!availableQuoteTotalFields}" />
+                                    </apex:selectList>
+                                </td>
+                                <td>
+                                    <table>
+                                        <tr><td><img src="/s.gif" alt="Add" class="picklistArrowRight" onclick="AddOption('AvailableQuoteTotalFields','SelectedQuoteTotalFields');" style="cursor:pointer; margin-top:1.8em;" title="Add" /></td></tr>
+                                        <tr><td><img src="/s.gif" alt="Remove" class="picklistArrowLeft" onclick="RemoveOption('SelectedQuoteTotalFields','AvailableQuoteTotalFields');" style="cursor:pointer; margin-top:2.2em;" title="Remove" /></td></tr>
+                                    </table>
+                                </td>
+                                <td>
+                                    <!-- Selected -->
+                                    <apex:selectList id="QuoteTotal" styleClass="SelectedQuoteTotalFields" size="6" multiselect="true" style="width:12em;" >
+                                        <apex:selectOptions value="{!selectedQuoteTotalFields}" />
+                                    </apex:selectList>
+                                </td>
+                                <td>
+                                    <table>
+                                        <tr><td><img src="/s.gif" alt="Up" class="upArrowIcon" onclick="MoveUp('SelectedQuoteTotalFields');" style="cursor:pointer; margin-top:1.8em;" title="Up" /></td></tr>
+                                        <tr><td><img src="/s.gif" alt="Down" class="downArrowIcon" onclick="MoveDown('SelectedQuoteTotalFields');" style="cursor:pointer; margin-top:2.2em;" title="Down" /></td></tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				
+				<!-- Summary Message -->
+				<apex:inputField style="width:100px; height:200px;" value="{!Template__c.Summary_Message__c}" />
+				<!-- Footer Type -->
+				<apex:inputField value="{!Template__c.Footer_Type__c}" />
+				<!-- Footer -->
+				<apex:inputField style="width:100px; height:200px;" value="{!Template__c.Footer__c}" />
+			</apex:pageBlockSection> 
+		</apex:pageBlock>
+	</apex:form>
+</apex:page>

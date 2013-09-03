@@ -1,0 +1,108 @@
+<apex:page standardController="Template__c" extensions="TemplateController">
+	<apex:sectionHeader title="Home" subtitle="{!Template__c.Name}" />
+	
+	<apex:form >
+		<apex:pageBlock title="{!Template__c.Name} Information">
+			<apex:pageBlockButtons >
+				<apex:commandButton value="Edit" action="{!URLFOR($Action.Template__c.Edit,Template__c.Id)}"/> 
+				<apex:commandButton value="Delete" action="{!URLFOR($Action.Template__c.Delete,Template__c.Id)}" />
+			</apex:pageBlockButtons>
+			<apex:pageBlockSection columns="2">
+			 	<!-- Name -->
+				<apex:outputField value="{!Template__c.Name}" />
+				<!-- Section Order -->
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Section Order" /> 
+					<apex:outputPanel layout="none" >
+						<table>
+                            <tr>  
+                                <td>
+                                    <!-- Selected -->
+                                    <apex:selectList style="width:auto;" readonly="true">
+                                        <apex:selectOptions value="{!sectionOrderList}" />
+                                    </apex:selectList>
+                                </td>
+                            </tr>
+                        </table>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				<!-- Header Type -->
+				<apex:outputField value="{!Template__c.Header_Type__c}" />
+				<!-- Header -->
+				<apex:outputField value="{!Template__c.Header__c}" />
+				<!-- Welcome Message -->
+				<apex:outputField value="{!Template__c.Welcome_Message__c}" />
+				<!--  Quote Info Fields -->
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Quote Info" /> 
+					<apex:outputPanel layout="none" >
+						<table>
+                            <tr>
+
+                                <td style="text-align:center;"><b>Selected</b></td>
+                            </tr>
+                            <tr>  
+                                <td>
+                                    <!-- Selected -->
+                                    <apex:selectList style="width:auto;" readonly="true">
+                                        <apex:selectOptions value="{!selectedQuoteInfoFields}" />
+                                    </apex:selectList>
+                                </td>
+                            </tr>
+                        </table>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				<!--  Quot Line Item Fields -->
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Quote Line Item" /> 
+					<apex:outputPanel layout="none" >
+						<table>
+                            <tr>
+
+                                <td style="text-align:center;"><b>Selected</b></td>
+                            </tr>
+                            <tr>  
+                                <td>
+                                    <!-- Selected -->
+                                     <apex:selectList style="width:auto;" readonly="true">
+                                        <apex:selectOptions value="{!selectedQuoteLineItemFields}" />
+                                    </apex:selectList>
+                                </td>
+                            </tr>
+                        </table>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				<!--  Show Quote Total -->
+				<apex:outputField value="{!Template__c.Show_Quote_Total__c}" />
+				<!-- Show Address  -->
+				<apex:outputField value="{!Template__c.Show_Address__c}" />
+				<!--  Quote Total Fields -->
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Quote Total" /> 
+					<apex:outputPanel layout="none" >
+						<table>
+                            <tr>
+
+                                <td style="text-align:center;"><b>Selected</b></td>
+                            </tr>
+                            <tr>  
+                                <td>
+                                    <!-- Selected -->
+                                    <apex:selectList style="width:auto;" readonly="true" >
+                                        <apex:selectOptions value="{!selectedQuoteTotalFields}" />
+                                    </apex:selectList>
+                                </td>
+                            </tr>
+                        </table>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				<!--  Summary Message -->
+				<apex:outputField value="{!Template__c.Summary_Message__c}" />
+				<!-- Footer Type -->
+				<apex:outputField value="{!Template__c.Footer_Type__c}" />
+				<!-- Footer -->
+				<apex:outputField value="{!Template__c.Footer__c}" />
+			</apex:pageBlockSection>
+		</apex:pageBlock>
+	</apex:form>
+</apex:page>

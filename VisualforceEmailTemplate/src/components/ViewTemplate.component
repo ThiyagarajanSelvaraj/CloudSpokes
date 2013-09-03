@@ -1,0 +1,102 @@
+<apex:component controller="DisplayTemplate" access="global" >
+    <apex:attribute name="Quote"  description="Id of the quote" type="Id" assignTo="{!quoteId}" />
+    <apex:attribute name="ContactName"  description="Name of the contact" type="String" />
+    
+    <html>
+        <body>
+            <table style="layout:fixed; min-width:1100px; min-height:1100px; height:auto; width:auto; border:1px solid black; border-collapse:collapse; margin-top:0px; margin-bottom:0px;">
+                <apex:repeat value="{!TemplateInfo}" var="order" >
+                    <apex:outputPanel layout="none" rendered="{!order == 'Header'}" >
+                        <tr>  
+                            <td align="center" style="min-width:1100px; width:auto; height:50px; border:1px solid black;" >
+                                <apex:image value="{!HTMLENCODE(HeaderImageUrl)}" rendered="{!template.Header_Type__c == 'Image' && NOT(ISNULL(HeaderImageUrl))}" />
+                                <apex:outputField style="vertical-align:middle" value="{!template.Header__c}" rendered="{!template.Header_Type__c == 'Text'}" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="left" style="padding-top:30px;">Dear {!ContactName},</td>
+                        </tr>
+                    </apex:outputPanel>
+                    <apex:outputPanel layout="none" rendered="{!order == 'Welcome Message'}" >
+                        <tr>  
+                            <td style="padding-top: 15px;" ><apex:outputField value="{!template.Welcome_Message__c}" /></td>
+                        </tr>
+                    </apex:outputPanel>
+                    <apex:outputPanel layout="none" rendered="{!order == 'Quote Info'}" >
+                        <tr>
+                            <td style="padding-top:15px; min-width:1100px; width:auto; white-space:nowrap;" align="right">
+                                <apex:repeat value="{!quoteInfoSection.selectedFields}" var="quoteField" >
+                                    <apex:outputText style="font-weight:bold;" value="{!quoteInfoSection.mapLabel[quoteField]}: " />
+                                    <apex:outputField value="{!quoteRecord[quoteField]}" />&nbsp;&nbsp;
+                                </apex:repeat>
+                            </td>
+                        </tr>
+                    </apex:outputPanel>
+                    <apex:outputPanel layout="none" rendered="{!showLineItemSection && order == 'Quote Line Items'}" >
+                        <tr>
+                            <td>
+                                <table style="margin-top:25px; min-width:1100px; width:auto; border-collapse:collapse;" cellpadding="5" >
+                                    <tr>
+                                        <apex:repeat value="{!quoteLineItemSection.selectedFields}" var="quoteItemField" >
+                                            <th style="border-bottom:3px solid black; text-align:left;" ><apex:outputText value="{!quoteLineItemSection.mapLabel[quoteItemField]}" /></th>
+                                        </apex:repeat>
+                                    </tr>
+                                        <apex:repeat value="{!QuoteLineItems}" var="quoteItemRecord" >
+                                            <tr>
+                                                <apex:repeat value="{!quoteLineItemSection.selectedFields}" var="quoteItemField" >
+                                                    <td style="border-bottom:3px solid black; text-align:left;" ><apex:outputField value="{!quoteItemRecord[quoteItemField]}" /></td>
+                                                </apex:repeat>
+                                            </tr>
+                                        </apex:repeat>
+                                </table>
+                            </td>
+                        </tr>
+                    </apex:outputPanel>
+                    <apex:outputPanel layout="none" rendered="{!showQuoteTotalSection && order == 'Quote Total' }" >
+                        <tr >
+                            <td style="padding-top:15px; right:0px; min-width:1100px; width:auto; white-space:nowrap;" >
+                                <table align="right" >
+                                    <apex:repeat value="{!quoteTotalSection.selectedFields}" var="quoteTotalField" >
+                                        <tr>
+                                            <td style="font-weight:bold; padding-right:70px;" ><apex:outputText value="{!quoteTotalSection.mapLabel[quoteTotalField]}" /></td>
+                                            <td style="text-align:right;" ><apex:outputField value="{!quoteRecord[quoteTotalField]}" /></td>
+                                        </tr>
+                                    </apex:repeat>
+                                </table>
+                            </td>
+                        </tr> 
+                    </apex:outputPanel>
+                    <apex:outputPanel layout="none" rendered="{!showAddress && order == 'Address'}" >
+                        <tr>
+                            <td>
+                                <table align="left" style="padding-top:25px;" >
+                                    <tr>
+                                        <td ><b>Billing Address</b></td>
+                                        <td style="padding-left:25px;"><b>Shipping Address</b></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding-right:10px;"><apex:outputField value="{!quoteAddress.Billing_Address__c}" /></td>
+                                        <td style="paddingpadding-right:10px; padding-left:25px;"><apex:outputField value="{!quoteAddress.Shipping_Address__c}" /></td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </apex:outputPanel>
+                    <apex:outputPanel layout="none" rendered="{!order == 'Summary Message'}" >
+                        <tr>  
+                            <td style="padding-top:90px; padding-bottom:90px;"><apex:outputField value="{!template.Summary_Message__c}" /></td>
+                        </tr>
+                    </apex:outputPanel>
+                    <apex:outputPanel layout="none" rendered="{!order == 'Footer'}" >
+                        <tr>  
+                            <td align="center" style="min-width:1100px; width:auto; height:50px; border:1px solid black;" >
+                                <apex:image value="{!HTMLENCODE(FooterImageUrl)}" rendered="{!template.Footer_Type__c == 'Image' && NOT(ISNULL(FooterImageUrl))}" />
+                                <apex:outputField style="vertical-align:middle" value="{!template.Footer__c}" rendered="{!template.Footer_Type__c == 'Text'}" />
+                            </td>
+                        </tr>
+                    </apex:outputPanel>
+                </apex:repeat>
+            </table>
+        </body>
+    </html> 
+</apex:component>
