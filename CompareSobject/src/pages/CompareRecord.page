@@ -1,0 +1,32 @@
+<apex:page controller="CompareSObject" action="{!compareRecord}" >
+	<apex:sectionHeader title="Home" subtitle="Compare {!recordName} Record" />
+	<apex:includeScript value="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" />
+	<apex:pageMessages />
+	<apex:form >
+		<apex:pageBlock title="Search for Auth ID" id="pbBlock" mode="maindetail" rendered="{!objCompareList.size > 0}" >
+			<apex:pageBlockButtons >
+				<apex:commandButton action="{!overrideData}" value="Yes, Override" />
+			</apex:pageBlockButtons> 
+			<hr />
+			<p><b>NOTE: selecting this Auth Id will override the following Current SF Info for this customer:</b></p> <br /><br/>
+			<apex:pageBlockSection columns="1" >
+				<apex:pageBlockTable style="width:100%;" value="{!objCompareList}" var="obj" >
+					<apex:column style="width:30%;" headerValue="" value="{!obj.fieldLabel}" />
+					<apex:column style="width:25%;" headerValue="Current SF Info" value="{!obj.recordValue}" />
+					<apex:column style="width:25%;" headerValue="Auth ID Info" value="{!obj.mapValue}" />
+					<apex:column style="width:2%;" headerValue="" >
+						<apex:inputCheckbox disabled="{!obj.isDisabled}" value="{!obj.isNotEqual}" >
+							<apex:actionSupport event="onchange" action="{!refreshPageBlock}" rerender="pbBlock" />
+						</apex:inputCheckbox>
+					</apex:column>
+					<apex:column style="width:18%;" headerValue="" >
+						<apex:outputLabel value="Yes, override current SF Info" rendered="{!obj.isNotEqual}" />
+					</apex:column>
+				</apex:pageBlockTable> 
+			</apex:pageBlockSection> 
+		</apex:pageBlock>
+		<apex:pageBlock mode="maindetail" title="Search for Auth ID"  rendered="{!objCompareList.size <= 0}" >
+			<p>None of the fields does not match with the external service map.</p>
+		</apex:pageBlock>
+	</apex:form>
+</apex:page>
