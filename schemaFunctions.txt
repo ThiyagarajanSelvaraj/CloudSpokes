@@ -1,7 +1,7 @@
 // Get the object schema 
 
 for(Schema.sObjectType objType : SChema.getGlboalDescribe().values()){
-	System.debug('Label is '+objType.getDescribe().getLabel()+' Name is '+objType.getDescribe().getName());
+	Syste.debug('Label is '+objType.getDescribe().getLabel()+' Name is '+objType.getDescribe().getName());
 }
 
 // Get the field schema 
